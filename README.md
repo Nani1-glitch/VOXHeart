@@ -61,7 +61,26 @@ heart_disease_predictor/
 - Pandas  
 - Scikit-learn  
 - OpenAI  
-- ReportLab  
+- ReportLab
+
+### 📄 Sample Output PDF
+The PDF report contains:
+
+- VOXHEART Logo 🩺  
+- Prediction Summary ✅/❌  
+- User Inputs & BMI Stats  
+- Explanation by GPT 🧠  
+- BMI & BP Charts  
+- Medical & Lifestyle Advice (dual column layout)  
+
+### 🧾 Exported via ReportLab, styled like a real hospital report.
+
+### ⚙️ Upcoming Features 
+✅ Mobile/Email Reminder Notification  
+✅ Chart.js Animated Graphs  
+✅ Full Voice-Controlled Form Submission (Enhanced)  
+✅ Auto Email Health Summary Report  
+
 
 ### 📦 Installation
 
@@ -79,7 +98,7 @@ python app.py
 Now open your browser and go to:
 📍 http://127.0.0.1:5000 ```
 
-**### 📄 Sample Output PDF**
+📄 Sample Output PDF
 The PDF report contains:
 
 - VOXHEART Logo 🩺  
@@ -91,7 +110,7 @@ The PDF report contains:
 
 🧾 Exported via ReportLab, styled like a real hospital report.
 
-**### ⚙️ Upcoming Features ** 
+⚙️ Upcoming Features 
 ✅ Mobile/Email Reminder Notification  
 ✅ Chart.js Animated Graphs  
 ✅ Full Voice-Controlled Form Submission (Enhanced)  
