@@ -2,7 +2,7 @@
 
 **VOXHEART** is an intelligent, voice-enhanced, and visually rich heart disease prediction system. It uses machine learning, personalized medical advice, and OpenAI-generated explanations to empower users with real-time health insights.
 
-> 🔬 Developed by [@Nithin](https://github.com/Nani1-glitch) — with ❤️ for precision & professionalism.
+> 🔬 Developed by [@Nithin & @Lalitha](https://github.com/Nani1-glitch) — with ❤️ for precision & professionalism.
 
 ---
 
@@ -70,16 +70,16 @@ git clone https://github.com/your-username/voxheart.git
 cd voxheart
 pip install -r requirements.txt
 🔐 Add your OpenAI key to .env as:
-OPENAI_API_KEY=your-api-key
+OPENAI_API_KEY=your-api-key ```
 
 ▶️ Run the App
 ```bash
 cd app
 python app.py
 Now open your browser and go to:
-📍 http://127.0.0.1:5000
+📍 http://127.0.0.1:5000 ```
 
-📄 Sample Output PDF  
+**### 📄 Sample Output PDF**
 The PDF report contains:
 
 - VOXHEART Logo 🩺  
@@ -91,7 +91,7 @@ The PDF report contains:
 
 🧾 Exported via ReportLab, styled like a real hospital report.
 
-⚙️ Upcoming Features  
+**### ⚙️ Upcoming Features ** 
 ✅ Mobile/Email Reminder Notification  
 ✅ Chart.js Animated Graphs  
 ✅ Full Voice-Controlled Form Submission (Enhanced)  
