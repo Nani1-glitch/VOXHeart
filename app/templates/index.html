@@ -2,320 +2,322 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VOXHEART - Heart Disease Predictor</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Helvetica Neue', sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 40px 20px;
-      position: relative;
+      margin:0; padding:0;
+      font-family:'Helvetica Neue',sans-serif;
+      background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      color:white;
+      display:flex; justify-content:center; align-items:flex-start;
+      min-height:100vh; padding:40px 20px;
+      position:relative;
     }
 
+    /* ─── Overlay Panels ───────────────────────────────────────── */
+    .panel {
+      position:absolute;
+      width:260px; height:220px;
+      background:rgba(255,255,255,0.05);
+      border-radius:16px;
+      box-shadow:0 0 20px rgba(0,255,255,0.2);
+      padding:16px; box-sizing:border-box;
+      display:none;
+      z-index:2;
+    }
+    #voiceLeft   { top:140px; left:60px; }
+    #voiceRight  { top:140px; right:60px; }
+    #adviceLeft  { bottom:180px; left:60px; }
+    #adviceRight { bottom:180px; right:60px; }
+
+    .panel h2 {
+      margin:0 0 12px; font-size:1.1rem; text-align:center;
+    }
+    .panel .content {
+      font-size:0.9rem; line-height:1.4; color:#00eaff;
+      overflow-y:auto; max-height:170px; white-space:pre-wrap;
+    }
+
+    /* ─── Main Container ───────────────────────────────────────── */
     .container {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      padding: 40px;
-      width: 700px;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+      position:relative;
+      background:rgba(255,255,255,0.05);
+      border-radius:20px;
+      padding:40px;
+      width:700px;
+      backdrop-filter:blur(20px);
+      box-shadow:0 0 30px rgba(0,255,255,0.2);
       animation: glow 6s ease-in-out infinite alternate;
-      z-index: 2;
-      position: relative;
+      box-sizing:border-box;
+      z-index:1;
     }
-
     @keyframes glow {
-      from { box-shadow: 0 0 20px rgba(0, 255, 255, 0.15); }
-      to   { box-shadow: 0 0 40px rgba(0, 255, 255, 0.35); }
+      from { box-shadow:0 0 20px rgba(0,255,255,0.15); }
+      to   { box-shadow:0 0 40px rgba(0,255,255,0.35); }
     }
-
     h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      font-weight: 300;
-      font-size: 2rem;
+      text-align:center; margin-bottom:30px;
+      font-weight:300; font-size:2rem;
     }
-
     .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      column-gap: 20px;
-      row-gap: 16px;
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      column-gap:20px; row-gap:16px;
     }
-
     input, select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 1rem;
-      border: none;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      box-sizing: border-box;
-      transition: background 0.3s ease;
+      width:100%; padding:12px; border:none;
+      border-radius:12px; font-size:1rem;
+      background:rgba(255,255,255,0.1); color:white;
+      box-sizing:border-box; transition:background 0.3s;
     }
-
-    input::placeholder {
-      color: rgba(255, 255, 255, 0.6);
-    }
-
+    input::placeholder { color:rgba(255,255,255,0.6); }
     input:focus, select:focus {
-      background: rgba(255, 255, 255, 0.2);
-      outline: none;
+      background:rgba(255,255,255,0.2); outline:none;
     }
-
     .action-buttons {
-      display: flex;
-      gap: 16px;
-      margin-top: 20px;
+      display:flex; gap:16px; margin-top:20px;
     }
-
     .action-buttons button {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 12px;
-      font-size: 1rem;
-      background: linear-gradient(45deg, #00d2ff, #3a7bd5);
-      color: white;
-      cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.4s ease;
+      flex:1; padding:12px; border:none;
+      border-radius:12px; font-size:1rem;
+      background:linear-gradient(45deg,#00d2ff,#3a7bd5);
+      color:white; cursor:pointer;
+      transition:transform 0.3s, box-shadow 0.4s;
     }
-
     .action-buttons button:hover {
-      transform: scale(1.03);
-      box-shadow: 0 0 18px rgba(0, 255, 255, 0.35);
+      transform:scale(1.03);
+      box-shadow:0 0 18px rgba(0,255,255,0.35);
     }
-
-    .typing-box {
-      display: none;
-      position: fixed;
-      top: 100px;
-      width: 280px;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(10px);
-      border-radius: 14px;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      color: #00eaff;
-      font-weight: 500;
-      max-height: 70vh;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      z-index: 999;
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-    }
-
-    #leftBox { left: 30px; }
-    #rightBox { right: 30px; }
-
     .result {
-      margin-top: 30px;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      font-size: 1.1rem;
-      color: #00f0ff;
+      margin-top:30px; padding:15px;
+      background:rgba(255,255,255,0.08);
+      border-radius:12px; font-size:1.1rem;
+      color:#00f0ff;
     }
-
     .ai-explanation {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.3);
-      color: #00eaff;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      font-weight: 500;
-      white-space: pre-wrap;
+      margin-top:20px; padding:15px;
+      background:rgba(0,0,0,0.3); border-radius:12px;
+      color:#00eaff; font-size:0.95rem;
+      line-height:1.6; font-weight:500;
+      white-space:pre-wrap;
     }
   </style>
 </head>
 <body>
 
-<!-- Suggestion Boxes -->
-<div class="typing-box" id="leftBox"></div>
-<div class="typing-box" id="rightBox"></div>
-
-<form class="container" method="POST">
-  <h1>Heart Disease Predictor</h1>
-  <div class="grid">
-    <input name="age" placeholder="Age (e.g. 45)" />
-    <input name="height" placeholder="Height (cm)" />
-    <input name="weight" placeholder="Weight (kg)" />
-    <input name="ap_hi" placeholder="Systolic BP" />
-    <input name="ap_lo" placeholder="Diastolic BP" />
-    <select name="gender"><option value="1">Female</option><option value="2">Male</option></select>
-    <select name="cholesterol"><option value="1">Cholesterol - Normal</option><option value="2">Above Normal</option><option value="3">Well Above Normal</option></select>
-    <select name="gluc"><option value="1">Glucose - Normal</option><option value="2">Above Normal</option><option value="3">Well Above Normal</option></select>
-    <select name="smoke"><option value="0">Non-Smoker</option><option value="1">Smoker</option></select>
-    <select name="alco"><option value="0">Doesn't Consume Alcohol</option><option value="1">Consumes Alcohol</option></select>
-    <select name="active"><option value="1">Physically Active</option><option value="0">Not Active</option></select>
+  <!-- ─── Voice Panels ────────────────────────────────────── -->
+  <div id="voiceLeft"  class="panel">
+    <h2>Questions</h2>
+    <div id="voiceQuestions" class="content"></div>
+  </div>
+  <div id="voiceRight" class="panel">
+    <h2>Answers</h2>
+    <div id="voiceAnswers" class="content"></div>
   </div>
 
-  <div class="action-buttons">
-    <button type="submit">🧠 Predict</button>
-    <button type="button" onclick="runVoiceForm()">🎙️ Voice Predict</button>
-  </div>
-
-  {% if prediction is not none %}
-  <div class="result">
-    <strong>Prediction: {{ 'At Risk of Heart Disease' if prediction == 1 else 'No Risk Detected' }}</strong><br><br>
-    {% if explanation %}
-      <div class="ai-explanation" id="aiBox"></div>
-      <script>typeEffect("aiBox", [`{{ explanation | replace('\n', '\\n') | safe }}`]);</script>
-    {% endif %}
-    {% if plot_bmi %}
-      <br><br><strong>BMI Visualization:</strong><br>
-      <img src="{{ url_for('static', filename=plot_bmi) }}" style="width: 100%; border-radius: 12px;" />
-    {% endif %}
-    {% if plot_bp %}
-      <br><br><strong>Blood Pressure Chart:</strong><br>
-      <img src="{{ url_for('static', filename=plot_bp) }}" style="width: 100%; border-radius: 12px;" />
-    {% endif %}
-
-    <!-- 📄 PDF Export Button -->
-    <div style="margin-top: 25px;">
-      <form method="GET" action="{{ url_for('download_pdf') }}" target="_blank">
-        <button type="submit" style="width: 100%; padding: 12px; margin-top: 10px; border-radius: 12px;
-                border: none; font-size: 1rem; background: linear-gradient(45deg, #3a7bd5, #00d2ff);
-                color: white; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.4s ease;">
-          📄 Export Full Report (PDF)
-        </button>
-      </form>
+  <!-- ─── Main Form ───────────────────────────────────────── -->
+  <form class="container" method="POST">
+    <h1>Heart Disease Predictor</h1>
+    <div class="grid">
+      <input name="age"    placeholder="Age (e.g. 45)" />
+      <input name="height" placeholder="Height (cm)"   />
+      <input name="weight" placeholder="Weight (kg)"   />
+      <input name="ap_hi"  placeholder="Systolic BP"    />
+      <input name="ap_lo"  placeholder="Diastolic BP"   />
+      <select name="gender">
+        <option value="1">Female</option>
+        <option value="2">Male</option>
+      </select>
+      <select name="cholesterol">
+        <option value="1">Cholesterol – Normal</option>
+        <option value="2">Above Normal</option>
+        <option value="3">Well Above Normal</option>
+      </select>
+      <select name="gluc">
+        <option value="1">Glucose – Normal</option>
+        <option value="2">Above Normal</option>
+        <option value="3">Well Above Normal</option>
+      </select>
+      <select name="smoke">
+        <option value="0">Non‑Smoker</option>
+        <option value="1">Smoker</option>
+      </select>
+      <select name="alco">
+        <option value="0">Doesn’t Consume Alcohol</option>
+        <option value="1">Consumes Alcohol</option>
+      </select>
+      <select name="active">
+        <option value="1">Physically Active</option>
+        <option value="0">Not Active</option>
+      </select>
     </div>
+
+    <div class="action-buttons">
+      <button type="submit">🧠 Predict</button>
+      <button type="button" onclick="runVoiceForm()">🎙️ Voice Predict</button>
+    </div>
+
+    {% if prediction is not none %}
+    <div class="result">
+      <strong>
+        Prediction: {{ 'At Risk of Heart Disease' if prediction==1 else 'No Risk Detected' }}
+      </strong><br><br>
+
+      {% if explanation %}
+        <div id="aiBox" class="ai-explanation"></div>
+        <script>
+          typeEffect("aiBox",[ `{{ explanation|replace('\n','\\n')|safe }}` ]);
+        </script>
+      {% endif %}
+
+      {% if plot_bmi %}
+        <br><strong>BMI Visualization:</strong><br>
+        <img src="{{ url_for('static',filename=plot_bmi) }}"
+             style="width:100%;border-radius:12px;" />
+      {% endif %}
+      {% if plot_bp %}
+        <br><strong>Blood Pressure Chart:</strong><br>
+        <img src="{{ url_for('static',filename=plot_bp) }}"
+             style="width:100%;border-radius:12px;" />
+      {% endif %}
+
+      <div style="margin-top:25px;">
+        <form method="GET" action="{{ url_for('download_pdf') }}" target="_blank">
+          <button type="submit" style="
+            width:100%;padding:12px;border-radius:12px;border:none;
+            font-size:1rem;background:linear-gradient(45deg,#3a7bd5,#00d2ff);
+            color:white;cursor:pointer;
+          ">
+            📄 Export Full Report (PDF)
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </form>
+
+  <!-- ─── Advice Panels ───────────────────────────────────── -->
+  <div id="adviceLeft"  class="panel">
+    <h2>Medical Advice</h2>
+    <div id="adviceLeftContent"  class="content"></div>
   </div>
+  <div id="adviceRight" class="panel">
+    <h2>Lifestyle Tips</h2>
+    <div id="adviceRightContent" class="content"></div>
+  </div>
+
+  <!-- ─── Inject Advice from Server ───────────────────────── -->
+  {% if advice_left|length > 0 %}
+  <script>
+    // show bottom panels on normal Predict
+    document.getElementById("adviceLeft").style.display  = 'block';
+    document.getElementById("adviceRight").style.display = 'block';
+    const advL = {{ advice_left|tojson }};
+    typeEffect("adviceLeftContent", advL);
+    const advR = {{ advice_right|tojson }};
+    typeEffect("adviceRightContent", advR);
+  </script>
   {% endif %}
-</form>
 
-<!-- 🧠 Dynamic Side Suggestions (Only if advice exists) -->
-{% if advice_left %}
-<script>
-  const leftSuggestions = {{ advice_left | tojson | safe }};
-  document.getElementById("leftBox").style.display = "block";
-  document.getElementById("leftBox").innerHTML = "";
-  typeEffect("leftBox", leftSuggestions);
-</script>
-{% endif %}
+  <!-- ─── Voice & Typing Logic ───────────────────────────── -->
+  <script>
+    const maleVariants = ["male","mail","man","mel","malee"];
+    const twoVariants  = ["2","two","to","too","tu","tool"];
 
-{% if advice_right %}
-<script>
-  const rightSuggestions = {{ advice_right | tojson | safe }};
-  document.getElementById("rightBox").style.display = "block";
-  document.getElementById("rightBox").innerHTML = "";
-  typeEffect("rightBox", rightSuggestions);
-</script>
-{% endif %}
-
-<script>
-  const maleVariants = ["male", "mail", "man", "mel", "malee"];
-  const twoVariants = ["2", "two", "to", "too", "tu", "tool"];
-
-  function cleanNumberInput(spoken) {
-    const numberWords = {
-      zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5,
-      six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
-      eleven: 11, twelve: 12, thirteen: 13, fourteen: 14,
-      fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19,
-      twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60,
-      seventy: 70, eighty: 80, ninety: 90
-    };
-    let words = spoken.toLowerCase().split(/[\s-]+/);
-    let total = 0;
-    for (let word of words) {
-      if (!isNaN(parseFloat(word))) return word;
-      if (numberWords[word] !== undefined) total += numberWords[word];
-    }
-    return total || "";
-  }
-
-  async function speak(text) {
-    const utter = new SpeechSynthesisUtterance(text);
-    window.speechSynthesis.speak(utter);
-    return new Promise(resolve => {
-      utter.onend = resolve;
-      leftBox.innerHTML += "🧠 " + text + "<br>";
-    });
-  }
-
-  async function listenAndFill(fieldName) {
-    const field = document.getElementsByName(fieldName)[0];
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'en-US';
-    recognition.start();
-    return new Promise(resolve => {
-      recognition.onresult = event => {
-        let value = event.results[0][0].transcript.trim().toLowerCase();
-        let clean = "";
-        if (["gender", "cholesterol", "gluc", "smoke", "alco", "active"].includes(fieldName)) {
-          if (fieldName === "gender") clean = maleVariants.some(v => value.includes(v)) ? "2" : "1";
-          else if (["cholesterol", "gluc"].includes(fieldName)) clean = value.includes("three") ? "3" : twoVariants.some(v => value.includes(v)) ? "2" : "1";
-          else clean = value.includes("yes") ? "1" : "0";
-        } else {
-          clean = cleanNumberInput(value);
-        }
-        field.value = clean;
-        rightBox.innerHTML += "🗣️ " + value + "<br>";
-        resolve();
-      };
-      recognition.onerror = () => {
-        field.value = "";
-        resolve();
-      };
-    });
-  }
-
-  async function runVoiceForm() {
-    leftBox.style.display = "block";
-    rightBox.style.display = "block";
-    leftBox.innerHTML = "";
-    rightBox.innerHTML = "";
-
-    const questions = [
-      { name: 'age', prompt: 'Please tell your age in years.' },
-      { name: 'height', prompt: 'What is your height in centimeters?' },
-      { name: 'weight', prompt: 'Tell me your weight in kilograms.' },
-      { name: 'ap_hi', prompt: 'What is your systolic blood pressure?' },
-      { name: 'ap_lo', prompt: 'Now your diastolic blood pressure?' },
-      { name: 'gender', prompt: 'Say your gender. Male or Female?' },
-      { name: 'cholesterol', prompt: 'Rate your cholesterol. 1 for normal, 2 for above, 3 for well above.' },
-      { name: 'gluc', prompt: 'Rate your glucose. 1 for normal, 2 for above, 3 for well above.' },
-      { name: 'smoke', prompt: 'Do you smoke? Say yes or no.' },
-      { name: 'alco', prompt: 'Do you consume alcohol? Say yes or no.' },
-      { name: 'active', prompt: 'Are you physically active? Say yes or no.' }
-    ];
-
-    for (const q of questions) {
-      await speak(q.prompt);
-      await listenAndFill(q.name);
-    }
-
-    await speak("All values received. Please click Predict.");
-  }
-
-  function typeEffect(elementId, lines) {
-    const el = document.getElementById(elementId);
-    if (!el || !Array.isArray(lines)) return;
-    const fullText = lines.join('\n');
-    let i = 0;
-    el.innerHTML = '';
-    function type() {
-      if (i < fullText.length) {
-        el.innerHTML += fullText.charAt(i);
-        i++;
-        setTimeout(type, 20);
+    function cleanNumberInput(s){
+      const map={ zero:0, one:1, two:2, three:3, four:4, five:5,
+                  six:6, seven:7, eight:8, nine:9, ten:10,
+                  eleven:11, twelve:12, thirteen:13, fourteen:14,
+                  fifteen:15, sixteen:16, seventeen:17, eighteen:18, nineteen:19,
+                  twenty:20, thirty:30, forty:40, fifty:50, sixty:60,
+                  seventy:70, eighty:80, ninety:90 };
+      let sum=0;
+      for(let w of s.toLowerCase().split(/[\s-]+/)){
+        if(!isNaN(parseFloat(w))) return w;
+        if(map[w]!=null) sum+=map[w];
       }
+      return sum||"";
     }
-    type();
-  }
-</script>
+
+    async function speak(text){
+      const box = document.getElementById("voiceQuestions");
+      const u   = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(u);
+      return new Promise(res=>{
+        u.onend=res;
+        box.innerHTML += "🧠 "+text+"<br>";
+      });
+    }
+
+    async function listenAndFill(fieldName){
+      const field=document.getElementsByName(fieldName)[0],
+            box  =document.getElementById("voiceAnswers"),
+            recog=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+      recog.lang="en-US"; recog.start();
+      return new Promise(res=>{
+        recog.onresult = e=>{
+          const val = e.results[0][0].transcript.trim().toLowerCase();
+          let clean="";
+          if(["gender","cholesterol","gluc","smoke","alco","active"].includes(fieldName)){
+            if(fieldName==="gender"){
+              clean = maleVariants.some(v => val.includes(v)) ? "2" : "1";
+            } else if(["cholesterol","gluc"].includes(fieldName)){
+              clean = val.includes("three") ? "3"
+                    : twoVariants.some(v => val.includes(v)) ? "2" : "1";
+            } else {
+              clean = val.includes("yes") ? "1" : "0";
+            }
+          } else {
+            clean = cleanNumberInput(val);
+          }
+          field.value=clean;
+          box.innerHTML += "🗣️ "+val+"<br>";
+          res();
+        };
+        recog.onerror = ()=>{ field.value=""; res(); };
+      });
+    }
+
+    async function runVoiceForm(){
+      document.getElementById("voiceLeft").style.display  = 'block';
+      document.getElementById("voiceRight").style.display = 'block';
+      document.getElementById("voiceQuestions").innerHTML = "";
+      document.getElementById("voiceAnswers").innerHTML   = "";
+
+      const steps=[
+        {name:"age",prompt:"Please tell your age in years."},
+        {name:"height",prompt:"What is your height in centimeters?"},
+        {name:"weight",prompt:"Tell me your weight in kilograms."},
+        {name:"ap_hi",prompt:"What is your systolic blood pressure?"},
+        {name:"ap_lo",prompt:"Now your diastolic blood pressure?"},
+        {name:"gender",prompt:"Say your gender: male or female."},
+        {name:"cholesterol",prompt:"Rate your cholesterol: 1 normal, 2 above, 3 well above."},
+        {name:"gluc",prompt:"Rate your glucose: 1 normal, 2 above, 3 well above."},
+        {name:"smoke",prompt:"Do you smoke? Say yes or no."},
+        {name:"alco",prompt:"Do you consume alcohol? Say yes or no."},
+        {name:"active",prompt:"Are you physically active? Say yes or no."}
+      ];
+
+      for(const s of steps){
+        await speak(s.prompt);
+        await listenAndFill(s.name);
+      }
+      await speak("All values received. Please click Predict.");
+    }
+
+    function typeEffect(id, lines){
+      const el=document.getElementById(id);
+      if(!el||!Array.isArray(lines)) return;
+      let txt=lines.join("\n"), i=0;
+      el.innerHTML="";
+      (function t(){
+        if(i<txt.length){
+          el.innerHTML+=txt.charAt(i++);
+          setTimeout(t,20);
+        }
+      })();
+    }
+  </script>
 </body>
 </html>
