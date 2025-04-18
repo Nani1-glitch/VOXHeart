@@ -1,0 +1,12 @@
+Flask
+numpy
+matplotlib
+pandas
+scikit-learn
+joblib
+python-dotenv
+openai
+reportlab
+pyttsx3
+SpeechRecognition
+PyAudio
