@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h1>Heart Disease Predictor</h1>
+  <form method="POST">
+    <!-- your 2‑column grid of inputs... -->
+    <div class="action-buttons">
+      <button type="submit">🧠 Predict</button>
+      <button type="button" onclick="runVoiceForm()">🎙️ Voice Predict</button>
+    </div>
+
+    {% if error %}
+      <div class="result" style="background:red;">{{ error }}</div>
+    {% endif %}
+
+    {% if prediction is not none %}
+      <div class="result">
+        <strong>Prediction:</strong>
+        {{ 'At Risk of Heart Disease' if prediction==1 else 'No Risk Detected' }}
+        <br><br>
+        {% if explanation %}
+          <div class="ai-explanation">{{ explanation }}</div>
+        {% endif %}
+        <!-- charts -->
+        <strong>BMI Visualization:</strong><br>
+        <img src="{{ url_for('static', filename=plot_bmi) }}" />
+        <br><strong>Blood Pressure Chart:</strong><br>
+        <img src="{{ url_for('static', filename=plot_bp) }}" />
+        <br>
+        <!-- PDF export -->
+        <form action="{{ url_for('download_pdf') }}">
+          <button type="submit">📄 Export Full Report (PDF)</button>
+        </form>
+      </div>
+    {% endif %}
+  </form>
+{% endblock %}
