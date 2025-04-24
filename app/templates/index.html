@@ -30,40 +30,45 @@
     #voiceRight  { top:140px; right:60px; }
     #adviceLeft  { bottom:180px; left:60px; }
     #adviceRight { bottom:180px; right:60px; }
-
-    .panel h2 {
-      margin:0 0 12px; font-size:1.1rem; text-align:center;
-    }
+    .panel h2 { margin:0 0 12px; font-size:1.1rem; text-align:center; }
     .panel .content {
       font-size:0.9rem; line-height:1.4; color:#00eaff;
       overflow-y:auto; max-height:170px; white-space:pre-wrap;
     }
 
+    /* ─── Pane: form + results side by side ─────────────────── */
+    .pane {
+      display: flex;
+      gap: 40px;
+      z-index:1;
+    }
+
     /* ─── Main Container ───────────────────────────────────────── */
-    .container {
-      position:relative;
+    .container, .results {
       background:rgba(255,255,255,0.05);
       border-radius:20px;
       padding:40px;
-      width:700px;
+      width: 360px;
       backdrop-filter:blur(20px);
       box-shadow:0 0 30px rgba(0,255,255,0.2);
       animation: glow 6s ease-in-out infinite alternate;
       box-sizing:border-box;
-      z-index:1;
     }
+    .container { /* left form pane */ }
+    .results  { /* right results pane */ }
     @keyframes glow {
       from { box-shadow:0 0 20px rgba(0,255,255,0.15); }
       to   { box-shadow:0 0 40px rgba(0,255,255,0.35); }
     }
+
     h1 {
       text-align:center; margin-bottom:30px;
       font-weight:300; font-size:2rem;
     }
     .grid {
       display:grid;
-      grid-template-columns:repeat(2,1fr);
-      column-gap:20px; row-gap:16px;
+      grid-template-columns:1fr;
+      row-gap:16px;
     }
     input, select {
       width:100%; padding:12px; border:none;
@@ -89,115 +94,46 @@
       transform:scale(1.03);
       box-shadow:0 0 18px rgba(0,255,255,0.35);
     }
+
+    /* ─── Results styling ───────────────────────────────────── */
     .result {
-      margin-top:30px; padding:15px;
+      margin-bottom:20px; padding:15px;
       background:rgba(255,255,255,0.08);
       border-radius:12px; font-size:1.1rem;
       color:#00f0ff;
     }
     .ai-explanation {
-      margin-top:20px; padding:15px;
+      margin:15px 0; padding:15px;
       background:rgba(0,0,0,0.3); border-radius:12px;
       color:#00eaff; font-size:0.95rem;
       line-height:1.6; font-weight:500;
       white-space:pre-wrap;
     }
+    .pdf-link {
+      display:inline-block;
+      width:100%; text-align:center;
+      padding:12px 0; margin-top:10px;
+      border-radius:12px;
+      background:linear-gradient(45deg,#3a7bd5,#00d2ff);
+      color:white; text-decoration:none;
+      font-size:1rem;
+    }
+    img.chart {
+      width:100%; border-radius:12px; margin:10px 0;
+    }
   </style>
 </head>
 <body>
 
-  <!-- ─── Voice Panels ────────────────────────────────────── -->
+  <!-- ─── Overlay Panels ────────────────────────────────────── -->
   <div id="voiceLeft"  class="panel">
     <h2>Questions</h2>
     <div id="voiceQuestions" class="content"></div>
   </div>
   <div id="voiceRight" class="panel">
     <h2>Answers</h2>
-    <div id="voiceAnswers" class="content"></div>
+    <div id="voiceAnswers"  class="content"></div>
   </div>
-
-  <!-- ─── Main Form ───────────────────────────────────────── -->
-  <form class="container" method="POST">
-    <h1>Heart Disease Predictor</h1>
-    <div class="grid">
-      <input name="age"    placeholder="Age (e.g. 45)" />
-      <input name="height" placeholder="Height (cm)"   />
-      <input name="weight" placeholder="Weight (kg)"   />
-      <input name="ap_hi"  placeholder="Systolic BP"    />
-      <input name="ap_lo"  placeholder="Diastolic BP"   />
-      <select name="gender">
-        <option value="1">Female</option>
-        <option value="2">Male</option>
-      </select>
-      <select name="cholesterol">
-        <option value="1">Cholesterol – Normal</option>
-        <option value="2">Above Normal</option>
-        <option value="3">Well Above Normal</option>
-      </select>
-      <select name="gluc">
-        <option value="1">Glucose – Normal</option>
-        <option value="2">Above Normal</option>
-        <option value="3">Well Above Normal</option>
-      </select>
-      <select name="smoke">
-        <option value="0">Non‑Smoker</option>
-        <option value="1">Smoker</option>
-      </select>
-      <select name="alco">
-        <option value="0">Doesn’t Consume Alcohol</option>
-        <option value="1">Consumes Alcohol</option>
-      </select>
-      <select name="active">
-        <option value="1">Physically Active</option>
-        <option value="0">Not Active</option>
-      </select>
-    </div>
-
-    <div class="action-buttons">
-      <button type="submit">🧠 Predict</button>
-      <button type="button" onclick="runVoiceForm()">🎙️ Voice Predict</button>
-    </div>
-
-    {% if prediction is not none %}
-    <div class="result">
-      <strong>
-        Prediction: {{ 'At Risk of Heart Disease' if prediction==1 else 'No Risk Detected' }}
-      </strong><br><br>
-
-      {% if explanation %}
-        <div id="aiBox" class="ai-explanation"></div>
-        <script>
-          typeEffect("aiBox",[ `{{ explanation|replace('\n','\\n')|safe }}` ]);
-        </script>
-      {% endif %}
-
-      {% if plot_bmi %}
-        <br><strong>BMI Visualization:</strong><br>
-        <img src="{{ url_for('static',filename=plot_bmi) }}"
-             style="width:100%;border-radius:12px;" />
-      {% endif %}
-      {% if plot_bp %}
-        <br><strong>Blood Pressure Chart:</strong><br>
-        <img src="{{ url_for('static',filename=plot_bp) }}"
-             style="width:100%;border-radius:12px;" />
-      {% endif %}
-
-      <div style="margin-top:25px;">
-        <form method="GET" action="{{ url_for('download_pdf') }}" target="_blank">
-          <button type="submit" style="
-            width:100%;padding:12px;border-radius:12px;border:none;
-            font-size:1rem;background:linear-gradient(45deg,#3a7bd5,#00d2ff);
-            color:white;cursor:pointer;
-          ">
-            📄 Export Full Report (PDF)
-          </button>
-        </form>
-      </div>
-    </div>
-    {% endif %}
-  </form>
-
-  <!-- ─── Advice Panels ───────────────────────────────────── -->
   <div id="adviceLeft"  class="panel">
     <h2>Medical Advice</h2>
     <div id="adviceLeftContent"  class="content"></div>
@@ -207,21 +143,98 @@
     <div id="adviceRightContent" class="content"></div>
   </div>
 
-  <!-- ─── Inject Advice from Server ───────────────────────── -->
-  {% if advice_left|length > 0 %}
-  <script>
-    // show bottom panels on normal Predict
-    document.getElementById("adviceLeft").style.display  = 'block';
-    document.getElementById("adviceRight").style.display = 'block';
-    const advL = {{ advice_left|tojson }};
-    typeEffect("adviceLeftContent", advL);
-    const advR = {{ advice_right|tojson }};
-    typeEffect("adviceRightContent", advR);
-  </script>
-  {% endif %}
+  <div class="pane">
+    <!-- ─── Left: Input Form ─────────────────────────────── -->
+    <form class="container" method="POST">
+      <h1>Heart Disease Predictor</h1>
+      <div class="grid">
+        <input name="age"    placeholder="Age (e.g. 45)" />
+        <input name="height" placeholder="Height (cm)"   />
+        <input name="weight" placeholder="Weight (kg)"   />
+        <input name="ap_hi"  placeholder="Systolic BP"    />
+        <input name="ap_lo"  placeholder="Diastolic BP"   />
+        <select name="gender">
+          <option value="1">Female</option>
+          <option value="2">Male</option>
+        </select>
+        <select name="cholesterol">
+          <option value="1">Cholesterol – Normal</option>
+          <option value="2">Above Normal</option>
+          <option value="3">Well Above Normal</option>
+        </select>
+        <select name="gluc">
+          <option value="1">Glucose – Normal</option>
+          <option value="2">Above Normal</option>
+          <option value="3">Well Above Normal</option>
+        </select>
+        <select name="smoke">
+          <option value="0">Non-Smoker</option>
+          <option value="1">Smoker</option>
+        </select>
+        <select name="alco">
+          <option value="0">Doesn’t Consume Alcohol</option>
+          <option value="1">Consumes Alcohol</option>
+        </select>
+        <select name="active">
+          <option value="1">Physically Active</option>
+          <option value="0">Not Active</option>
+        </select>
+      </div>
 
-  <!-- ─── Voice & Typing Logic ───────────────────────────── -->
+      <div class="action-buttons">
+        <button type="submit">🧠 Predict</button>
+        <button type="button" onclick="runVoiceForm()">🎙️ Voice Predict</button>
+      </div>
+    </form>
+
+    <!-- ─── Right: Results + Export ──────────────────────── -->
+    <div class="results">
+      {% if prediction is not none %}
+        <div class="result">
+          <strong>
+            Prediction: {{ 'At Risk of Heart Disease' if prediction==1 else 'No Risk Detected' }}
+          </strong>
+        </div>
+
+        {% if explanation %}
+          <div id="aiBox" class="ai-explanation"></div>
+          <script>
+            typeEffect("aiBox",[ `{{ explanation|replace('\n','\\n')|safe }}` ]);
+          </script>
+        {% endif %}
+
+        {% if plot_bmi %}
+          <strong>BMI Visualization:</strong>
+          <img src="{{ url_for('static',filename=plot_bmi) }}"
+               class="chart" />
+        {% endif %}
+
+        {% if plot_bp %}
+          <strong>Blood Pressure Chart:</strong>
+          <img src="{{ url_for('static',filename=plot_bp) }}"
+               class="chart" />
+        {% endif %}
+
+        <a href="{{ url_for('download_pdf') }}"
+           target="_blank"
+           class="pdf-link">
+          📄 Export Full Report (PDF)
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ─── Client JS: show panels & typing effect ─────────── -->
   <script>
+    // Advice panels
+    {% if advice_left|length > 0 %}
+      document.getElementById('adviceLeft').style.display  = 'block';
+      document.getElementById('adviceRight').style.display = 'block';
+      typeEffect('adviceLeftContent',  {{ advice_left | tojson }});
+      typeEffect('adviceRightContent', {{ advice_right| tojson }});
+    {% endif %}
+
+    // Voice panels & logic (unchanged)…
     const maleVariants = ["male","mail","man","mel","malee"];
     const twoVariants  = ["2","two","to","too","tu","tool"];
 
@@ -252,7 +265,8 @@
 
     async function listenAndFill(fieldName){
       const field=document.getElementsByName(fieldName)[0],
-            box  =document.getElementById("voiceAnswers"),
+            qBox =document.getElementById("voiceQuestions"),
+            aBox =document.getElementById("voiceAnswers"),
             recog=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
       recog.lang="en-US"; recog.start();
       return new Promise(res=>{
@@ -261,18 +275,18 @@
           let clean="";
           if(["gender","cholesterol","gluc","smoke","alco","active"].includes(fieldName)){
             if(fieldName==="gender"){
-              clean = maleVariants.some(v => val.includes(v)) ? "2" : "1";
+              clean = maleVariants.some(v=>val.includes(v))?"2":"1";
             } else if(["cholesterol","gluc"].includes(fieldName)){
-              clean = val.includes("three") ? "3"
-                    : twoVariants.some(v => val.includes(v)) ? "2" : "1";
+              clean = val.includes("three")?"3"
+                    : twoVariants.some(v=>val.includes(v))?"2":"1";
             } else {
-              clean = val.includes("yes") ? "1" : "0";
+              clean = val.includes("yes")?"1":"0";
             }
           } else {
             clean = cleanNumberInput(val);
           }
           field.value=clean;
-          box.innerHTML += "🗣️ "+val+"<br>";
+          aBox.innerHTML += "🗣️ "+val+"<br>";
           res();
         };
         recog.onerror = ()=>{ field.value=""; res(); };
@@ -284,7 +298,6 @@
       document.getElementById("voiceRight").style.display = 'block';
       document.getElementById("voiceQuestions").innerHTML = "";
       document.getElementById("voiceAnswers").innerHTML   = "";
-
       const steps=[
         {name:"age",prompt:"Please tell your age in years."},
         {name:"height",prompt:"What is your height in centimeters?"},
@@ -298,7 +311,6 @@
         {name:"alco",prompt:"Do you consume alcohol? Say yes or no."},
         {name:"active",prompt:"Are you physically active? Say yes or no."}
       ];
-
       for(const s of steps){
         await speak(s.prompt);
         await listenAndFill(s.name);
