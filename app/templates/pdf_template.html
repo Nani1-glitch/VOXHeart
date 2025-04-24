@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <style>
+    body { font-family: Helvetica, sans-serif; margin: 0; padding: 0; }
+    .logo { text-align: center; margin-top: 20px; }
+    .title { text-align: center; font-size: 18px; font-weight: bold; 
+             margin: 10px 0; border-bottom: 1px solid #333; }
+    .columns { display: flex; margin: 20px; }
+    .col { flex: 1; padding: 0 10px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #333; padding: 4px; font-size: 10px; }
+    th { background: #203a43; color: white; }
+    .chart { margin-bottom: 10px; }
+    .panel { border: 1px solid #333; border-radius: 4px; padding: 8px;
+             margin: 0 10px; font-size: 9px; min-height: 50px; }
+    .panel h3 { margin: 0 0 4px; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <img src="{{ url_for('static',filename='logo.png') }}" width="60"/>
+  </div>
+  <div class="title">VOXHEART – Heart Disease Report</div>
+  <div class="columns">
+    <div class="col">
+      <table>
+        <tr><th>Field</th><th>Value</th></tr>
+        {% for k,v in user_data.items() %}
+          <tr><td>{{ k.replace('_',' ').capitalize() }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div class="col">
+      <div class="chart">
+        <img src="{{ url_for('static',filename=plot_bmi) }}" width="100%"/>
+      </div>
+      <div class="chart">
+        <img src="{{ url_for('static',filename=plot_bp) }}" width="100%"/>
+      </div>
+    </div>
+  </div>
+  <div class="columns" style="margin-top:0;">
+    <div class="col panel">
+      <h3>Medical Advice</h3>
+      <ul>
+        {% for tip in advice_left %}
+          <li>{{ tip }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col panel">
+      <h3>Lifestyle Tips</h3>
+      <ul>
+        {% for tip in advice_right %}
+          <li>{{ tip }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
